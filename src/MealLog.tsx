@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { isSameDay } from './calendar'
 import { addMeal, currentTimeString, deleteMeal, mealsOfDay, timeOnDay } from './meals'
 import './App.css'
 
@@ -7,25 +8,26 @@ const timeFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '
 const dateFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
 
 interface Props {
-  username: string
-  onLogout: () => void
+  // Der Tag, für den Einträge angezeigt und gespeichert werden
+  day: Date
 }
 
-function MealLog({ username, onLogout }: Props) {
+function MealLog({ day }: Props) {
   const [description, setDescription] = useState('')
   const [time, setTime] = useState(currentTimeString)
   const [saving, setSaving] = useState(false)
 
-  const [today] = useState(() => new Date())
+  const [now] = useState(() => new Date())
+  const isToday = isSameDay(day, now)
   // useLiveQuery aktualisiert die Liste automatisch, sobald sich die Datenbank ändert.
-  const meals = useLiveQuery(() => mealsOfDay(today), [today])
+  const meals = useLiveQuery(() => mealsOfDay(day), [day])
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (!description.trim()) return
     setSaving(true)
     try {
-      await addMeal(description, timeOnDay(today, time))
+      await addMeal(description, timeOnDay(day, time))
       setDescription('')
       setTime(currentTimeString())
     } finally {
@@ -36,14 +38,8 @@ function MealLog({ username, onLogout }: Props) {
   return (
     <main className="page">
       <header>
-        <div className="user-bar">
-          <span>Angemeldet als <strong>{username}</strong></span>
-          <button type="button" className="link" onClick={onLogout}>
-            Abmelden
-          </button>
-        </div>
         <h1>Mahlzeit eintragen</h1>
-        <p className="date">{dateFormat.format(today)}</p>
+        <p className="date">{dateFormat.format(day)}</p>
       </header>
 
       <form className="card meal-form" onSubmit={handleSubmit}>
@@ -77,7 +73,7 @@ function MealLog({ username, onLogout }: Props) {
       </form>
 
       <section>
-        <h2>Heute</h2>
+        <h2>{isToday ? 'Heute' : 'An diesem Tag'}</h2>
         {meals === undefined ? (
           <p className="hint">Lade …</p>
         ) : meals.length === 0 ? (

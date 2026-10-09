@@ -208,10 +208,180 @@ button.link {
   text-decoration: underline;
 }
 
-.user-bar {
+/* ---------- Dock (Navigation) ---------- */
+
+/* Handy: Dock unten am Bildschirmrand. Die Seite bekommt unten Platz, damit nichts verdeckt wird. */
+.app-shell {
+  --dock-size: 64px;
+  padding-bottom: calc(var(--dock-size) + env(safe-area-inset-bottom));
+}
+
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+button.dock-item {
+  flex: 1;
+  height: var(--dock-size);
+  min-height: 0;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.dock-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+button.dock-item.active {
+  color: var(--accent);
+  box-shadow: inset 0 3px 0 var(--accent);
+}
+
+/* Computer (breite Bildschirme): Dock als Leiste am linken Rand */
+@media (min-width: 768px) {
+  .app-shell {
+    --dock-size: 88px;
+    padding-bottom: 0;
+    padding-left: var(--dock-size);
+  }
+
+  .dock {
+    top: 0;
+    right: auto;
+    width: var(--dock-size);
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 16px 0;
+    border-top: none;
+    border-right: 1px solid var(--border);
+  }
+
+  button.dock-item {
+    flex: none;
+    height: 76px;
+  }
+
+  button.dock-item.active {
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+}
+
+/* ---------- Kalender ---------- */
+
+.calendar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin-bottom: 16px;
+}
+
+.calendar-header h1 {
+  margin: 0;
+  text-align: center;
+}
+
+button.month-nav {
+  min-width: 48px;
+  padding: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.calendar {
+  padding: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.weekday {
+  padding: 4px 0 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--muted);
+}
+
+/* Auf schmalen Bildschirmen passen nur die Kürzel (Mo, Di, …) */
+.weekday-long {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .weekday-long {
+    display: inline;
+  }
+
+  .weekday-short {
+    display: none;
+  }
+}
+
+button.day {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+button.day:hover {
+  background: var(--bg);
+}
+
+button.day.today {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.day-dot {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+button.day.today .day-dot {
+  background: var(--accent-text);
+}
+
+button.back-to-today,
+button.logout {
+  width: 100%;
+  margin-top: 12px;
 }

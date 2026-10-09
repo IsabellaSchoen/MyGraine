@@ -19,9 +19,20 @@ export interface User {
   createdAt: number
 }
 
+// Persönliche Angaben, eine Zeile pro Benutzerkonto (userId ist gleichzeitig der Schlüssel).
+export interface Profile {
+  userId: number
+  displayName: string
+  // Geburtsdatum als "JJJJ-MM-TT" (so liefert es <input type="date">), leer = keine Angabe
+  birthDate: string
+  notes: string
+  updatedAt: number
+}
+
 export const db = new Dexie('MyGraine') as Dexie & {
   meals: EntityTable<Meal, 'id'>
   users: EntityTable<User, 'id'>
+  profiles: EntityTable<Profile, 'userId'>
 }
 
 // Version 1 des Schemas: "++id" = automatisch hochzählende ID, "eatenAt" = Index für Zeitabfragen
@@ -33,4 +44,11 @@ db.version(1).stores({
 db.version(2).stores({
   meals: '++id, eatenAt',
   users: '++id, &username',
+})
+
+// Version 3: persönliche Angaben. "userId" ist der Schlüssel, damit jedes Konto genau ein Profil hat.
+db.version(3).stores({
+  meals: '++id, eatenAt',
+  users: '++id, &username',
+  profiles: 'userId',
 })

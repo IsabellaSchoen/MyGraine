@@ -32,3 +32,6 @@ backups/
 .DS_Store
 *.swp
 *.swo
+
+# Arbeitsordner von Claude Code
+.claude/worktrees/

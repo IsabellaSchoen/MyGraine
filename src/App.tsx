@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { db, type User } from './db'
+import CalendarPage from './CalendarPage'
+import Dock, { type View } from './Dock'
 import LoginPage from './LoginPage'
 import MealLog from './MealLog'
+import ProfilePage from './ProfilePage'
 import './App.css'
 
 // Unter diesem Schlüssel merkt sich der Browser, wer angemeldet ist (nur die ID, kein Passwort).
@@ -28,6 +31,9 @@ function writeSession(id: number | null) {
 function App() {
   const [user, setUser] = useState<User | null>(null)
   const [checking, setChecking] = useState(() => readSession() !== null)
+  // Welche Seite gerade sichtbar ist, und für welchen Tag eingetragen wird
+  const [view, setView] = useState<View>('home')
+  const [selectedDay, setSelectedDay] = useState(() => new Date())
 
   // Beim Start: War schon jemand angemeldet? Dann das Konto aus der Datenbank laden.
   useEffect(() => {
@@ -53,13 +59,37 @@ function App() {
   }
 
   return (
-    <MealLog
-      username={user.username}
-      onLogout={() => {
-        writeSession(null)
-        setUser(null)
-      }}
-    />
+    <div className="app-shell">
+      {view === 'home' && (
+        <CalendarPage
+          onSelectDay={(day) => {
+            setSelectedDay(day)
+            setView('add')
+          }}
+        />
+      )}
+      {view === 'add' && <MealLog day={selectedDay} />}
+      {view === 'profile' && (
+        <ProfilePage
+          userId={user.id}
+          username={user.username}
+          onLogout={() => {
+            writeSession(null)
+            setUser(null)
+            setView('home')
+          }}
+        />
+      )}
+
+      <Dock
+        current={view}
+        onNavigate={(next) => {
+          // Das ➕ im Dock trägt immer für heute ein; ein anderer Tag wird über den Kalender gewählt.
+          if (next === 'add') setSelectedDay(new Date())
+          setView(next)
+        }}
+      />
+    </div>
   )
 }
 
