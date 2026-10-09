@@ -1,0 +1,34 @@
+# Abhängigkeiten (werden mit `bun install` neu geladen)
+node_modules
+
+# Build-Ausgaben
+dist
+dist-ssr
+*.tsbuildinfo
+
+# Lokale Umgebungsvariablen / Einstellungen
+.env
+.env.*
+*.local
+
+# Logs
+logs
+*.log
+
+# Keine echten Gesundheitsdaten, Exporte oder Backups ins Repository
+*.csv
+*.json
+!package.json
+!tsconfig*.json
+!.oxlintrc.json
+!.vscode/extensions.json
+exports/
+backups/
+
+# Editor- und Systemdateien
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.swp
+*.swo
