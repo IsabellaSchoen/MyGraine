@@ -7,11 +7,19 @@ interface Props {
   onLogout: () => void
 }
 
+// Die Textfelder unter Name und Geburtsdatum, in der Reihenfolge, in der sie angezeigt werden
+const TEXT_FIELDS: { field: keyof ProfileInput; label: string; placeholder: string }[] = [
+  { field: 'contraception', label: 'Verhütung', placeholder: 'z. B. Pille, Spirale, keine' },
+  { field: 'illnesses', label: 'Krankheiten', placeholder: 'z. B. Bluthochdruck, Schilddrüse' },
+  { field: 'allergies', label: 'Allergien', placeholder: 'z. B. Pollen, Penicillin' },
+  { field: 'migraineStart', label: 'Migräne Beginn', placeholder: 'z. B. seit 2015, mit 16 Jahren' },
+  { field: 'notes', label: 'Weitere Notizen', placeholder: 'z. B. Medikamente, Ärztin' },
+]
+
 function ProfilePage({ userId, username, onLogout }: Props) {
   const [profile, setProfile] = useState<ProfileInput>(EMPTY_PROFILE)
   const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     void loadProfile(userId).then((p) => {
@@ -22,7 +30,6 @@ function ProfilePage({ userId, username, onLogout }: Props) {
 
   function change(field: keyof ProfileInput, value: string) {
     setProfile((p) => ({ ...p, [field]: value }))
-    setSaved(false)
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -30,7 +37,6 @@ function ProfilePage({ userId, username, onLogout }: Props) {
     setSaving(true)
     try {
       await saveProfile(userId, profile)
-      setSaved(true)
     } finally {
       setSaving(false)
     }
@@ -39,11 +45,10 @@ function ProfilePage({ userId, username, onLogout }: Props) {
   return (
     <main className="page">
       <header>
-        <h1>Persönliche Angaben</h1>
-        <p className="date">Angemeldet als {username}</p>
+        <h1>MyGraine Information</h1>
       </header>
 
-      <form className="card meal-form" onSubmit={handleSubmit}>
+      <form className="card meal-form profile-form" onSubmit={handleSubmit}>
         <label htmlFor="display-name">Name</label>
         <input
           id="display-name"
@@ -62,28 +67,28 @@ function ProfilePage({ userId, username, onLogout }: Props) {
           disabled={!loaded}
         />
 
-        <label htmlFor="notes">Notizen</label>
-        <textarea
-          id="notes"
-          value={profile.notes}
-          onChange={(e) => change('notes', e.target.value)}
-          placeholder="z. B. Medikamente, bekannte Auslöser, Ärztin"
-          rows={4}
-          disabled={!loaded}
-        />
+        {TEXT_FIELDS.map(({ field, label, placeholder }) => (
+          <div key={field} className="profile-field">
+            <label htmlFor={`profile-${field}`}>{label}</label>
+            <textarea
+              id={`profile-${field}`}
+              value={profile[field]}
+              onChange={(e) => change(field, e.target.value)}
+              placeholder={placeholder}
+              rows={field === 'notes' ? 4 : 2}
+              disabled={!loaded}
+            />
+          </div>
+        ))}
 
         <button type="submit" disabled={!loaded || saving}>
           Speichern
         </button>
-        {saved && (
-          <p className="hint" role="status">
-            Gespeichert.
-          </p>
-        )}
       </form>
 
       <p className="hint">Alle Angaben bleiben nur auf diesem Gerät gespeichert.</p>
 
+      <p className="hint">Angemeldet als {username}</p>
       <button type="button" className="secondary logout" onClick={onLogout}>
         Abmelden
       </button>

@@ -25,6 +25,11 @@ export interface Profile {
   displayName: string
   // Geburtsdatum als "JJJJ-MM-TT" (so liefert es <input type="date">), leer = keine Angabe
   birthDate: string
+  // Freitextfelder; bei Profilen von vor dieser Erweiterung fehlen sie (dann gilt: leer)
+  contraception?: string
+  illnesses?: string
+  allergies?: string
+  migraineStart?: string
   notes: string
   updatedAt: number
 }
