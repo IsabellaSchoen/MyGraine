@@ -256,6 +256,34 @@ button.dock-item.active {
   box-shadow: inset 0 3px 0 var(--accent);
 }
 
+/* Das Plus: großer lila Kreis in der Mitte des Docks */
+.dock-add-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.dock-add {
+  width: 60px;
+  height: 60px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--purple);
+  color: var(--purple-text);
+  font-size: 2.2rem;
+  font-weight: 400;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(123, 79, 214, 0.35);
+}
+
+button.dock-add[aria-current='page'] {
+  box-shadow:
+    0 0 0 3px var(--card),
+    0 0 0 5px var(--purple);
+}
+
 /* Computer (breite Bildschirme): Dock als Leiste am linken Rand */
 @media (min-width: 768px) {
   .app-shell {
@@ -284,28 +312,14 @@ button.dock-item.active {
   button.dock-item.active {
     box-shadow: inset 3px 0 0 var(--accent);
   }
+
+  .dock-add-slot {
+    flex: none;
+    height: 76px;
+  }
 }
 
 /* ---------- Kalender ---------- */
-
-.top-bar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 12px;
-}
-
-/* Das Plus im Kreis oben rechts */
-button.add-circle {
-  width: 48px;
-  height: 48px;
-  min-height: 0;
-  padding: 0;
-  border-radius: 50%;
-  font-size: 1.8rem;
-  font-weight: 400;
-  line-height: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
 
 .calendar {
   padding: 16px 8px 12px;

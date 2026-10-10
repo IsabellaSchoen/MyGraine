@@ -7,8 +7,10 @@
   --accent: #4b5bd6;
   --accent-text: #ffffff;
   --danger: #b42318;
+  --purple: #7b4fd6;
+  --purple-text: #ffffff;
 
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Nunito Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   color: var(--text);
   background: var(--bg);
@@ -25,6 +27,8 @@
     --accent: #8b97ff;
     --accent-text: #11131a;
     --danger: #ff8a80;
+    --purple: #9b7bf0;
+    --purple-text: #ffffff;
   }
 }
 

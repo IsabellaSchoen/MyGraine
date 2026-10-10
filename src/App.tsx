@@ -61,7 +61,7 @@ function App() {
   return (
     <div className="app-shell">
       {view === 'home' && (
-        <CalendarPage selected={selectedDay} onSelect={setSelectedDay} onAdd={() => setView('add')} />
+        <CalendarPage selected={selectedDay} onSelect={setSelectedDay} />
       )}
       {view === 'add' && <EntryPage day={selectedDay} onDone={() => setView('home')} />}
       {view === 'profile' && (
@@ -78,11 +78,8 @@ function App() {
 
       <Dock
         current={view}
-        onNavigate={(next) => {
-          // Das ➕ im Dock trägt immer für heute ein; ein anderer Tag wird über den Kalender gewählt.
-          if (next === 'add') setSelectedDay(new Date())
-          setView(next)
-        }}
+        // Das ＋ im Dock trägt für den Tag ein, der gerade im Kalender ausgewählt ist (anfangs heute).
+        onNavigate={setView}
       />
     </div>
   )

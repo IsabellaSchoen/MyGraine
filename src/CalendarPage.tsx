@@ -13,11 +13,9 @@ interface Props {
   // Der ausgewählte Tag (mit Ring markiert); seine Einträge stehen unter dem Kalender.
   selected: Date
   onSelect: (day: Date) => void
-  // Das ⊕ oben rechts: neuen Eintrag für den ausgewählten Tag anlegen
-  onAdd: () => void
 }
 
-function CalendarPage({ selected, onSelect, onAdd }: Props) {
+function CalendarPage({ selected, onSelect }: Props) {
   const [today] = useState(() => new Date())
   // Der angezeigte Monat, immer als 1. des Monats gespeichert. Startet beim Monat des ausgewählten Tages.
   const [shown, setShown] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1))
@@ -48,12 +46,6 @@ function CalendarPage({ selected, onSelect, onAdd }: Props) {
 
   return (
     <main className="page">
-      <div className="top-bar">
-        <button type="button" className="add-circle" aria-label="Neuer Eintrag" onClick={onAdd}>
-          +
-        </button>
-      </div>
-
       <div className="card calendar">
         <header className="calendar-header">
           <h1>{monthFormat.format(shown)}</h1>
@@ -155,7 +147,7 @@ function CalendarPage({ selected, onSelect, onAdd }: Props) {
         ))}
 
         {selectedMood === undefined && selectedMeals?.length === 0 && (
-          <p className="hint">Noch keine Einträge. Tippe oben rechts auf ＋, um etwas einzutragen.</p>
+          <p className="hint">Noch keine Einträge. Tippe unten auf ＋, um etwas einzutragen.</p>
         )}
       </section>
     </main>
