@@ -2,30 +2,45 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { dayKey, isSameDay, monthGrid, WEEKDAYS_LONG, WEEKDAYS_SHORT } from './calendar'
 import { db } from './db'
+import { mealsOfDay } from './meals'
+import { moodInfo, moodOfDay, moodsOfMonth } from './moods'
 
 const monthFormat = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
 const dayLabelFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
+const timeFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' })
 
 interface Props {
-  onSelectDay: (day: Date) => void
+  // Der ausgewählte Tag (mit Ring markiert); seine Einträge stehen unter dem Kalender.
+  selected: Date
+  onSelect: (day: Date) => void
+  // Das ⊕ oben rechts: neuen Eintrag für den ausgewählten Tag anlegen
+  onAdd: () => void
 }
 
-function CalendarPage({ onSelectDay }: Props) {
+function CalendarPage({ selected, onSelect, onAdd }: Props) {
   const [today] = useState(() => new Date())
-  // Der angezeigte Monat, immer als 1. des Monats gespeichert.
-  const [shown, setShown] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
+  // Der angezeigte Monat, immer als 1. des Monats gespeichert. Startet beim Monat des ausgewählten Tages.
+  const [shown, setShown] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1))
 
   const year = shown.getFullYear()
   const month = shown.getMonth()
   const cells = monthGrid(year, month)
 
-  // Welche Tage dieses Monats haben schon Einträge? Die bekommen einen kleinen Punkt.
-  const daysWithEntries = useLiveQuery(async () => {
+  // Stimmungen dieses Monats: Diese Tage werden in der Farbe der Stimmung ausgemalt.
+  const moods = useLiveQuery(() => moodsOfMonth(year, month), [year, month])
+
+  // Welche Tage dieses Monats haben Mahlzeiten? Die bekommen einen kleinen Punkt.
+  const daysWithMeals = useLiveQuery(async () => {
     const start = new Date(year, month, 1).getTime()
     const end = new Date(year, month + 1, 1).getTime()
     const meals = await db.meals.where('eatenAt').between(start, end, true, false).toArray()
     return new Set(meals.map((m) => dayKey(new Date(m.eatenAt))))
   }, [year, month])
+
+  // Alles, was unter dem Kalender für den ausgewählten Tag angezeigt wird
+  const selectedMood = useLiveQuery(() => moodOfDay(selected), [selected])
+  const selectedMeals = useLiveQuery(() => mealsOfDay(selected), [selected])
+  const mood = selectedMood !== undefined ? moodInfo(selectedMood) : undefined
 
   function changeMonth(delta: number) {
     setShown(new Date(year, month + delta, 1))
@@ -33,17 +48,25 @@ function CalendarPage({ onSelectDay }: Props) {
 
   return (
     <main className="page">
-      <header className="calendar-header">
-        <button type="button" className="month-nav" aria-label="Vorheriger Monat" onClick={() => changeMonth(-1)}>
-          ‹
+      <div className="top-bar">
+        <button type="button" className="add-circle" aria-label="Neuer Eintrag" onClick={onAdd}>
+          +
         </button>
-        <h1>{monthFormat.format(shown)}</h1>
-        <button type="button" className="month-nav" aria-label="Nächster Monat" onClick={() => changeMonth(1)}>
-          ›
-        </button>
-      </header>
+      </div>
 
       <div className="card calendar">
+        <header className="calendar-header">
+          <h1>{monthFormat.format(shown)}</h1>
+          <div className="month-nav-group">
+            <button type="button" className="month-nav" aria-label="Vorheriger Monat" onClick={() => changeMonth(-1)}>
+              ‹
+            </button>
+            <button type="button" className="month-nav" aria-label="Nächster Monat" onClick={() => changeMonth(1)}>
+              ›
+            </button>
+          </div>
+        </header>
+
         <div className="calendar-grid weekdays">
           {WEEKDAYS_LONG.map((name, i) => (
             <div key={name} className="weekday" title={name}>
@@ -56,25 +79,37 @@ function CalendarPage({ onSelectDay }: Props) {
         </div>
 
         <div className="calendar-grid">
-          {cells.map((day, i) =>
-            day === null ? (
-              <div key={`leer-${i}`} />
-            ) : (
+          {cells.map((day, i) => {
+            if (day === null) return <div key={`leer-${i}`} />
+            const key = dayKey(day)
+            const dayMood = moods?.get(key)
+            const info = dayMood !== undefined ? moodInfo(dayMood) : undefined
+            const classes = ['day']
+            if (isSameDay(day, today)) classes.push('today')
+            if (isSameDay(day, selected)) classes.push('selected')
+            if (info) classes.push('has-mood')
+
+            return (
               <button
-                key={day.getDate()}
+                key={key}
                 type="button"
-                className={isSameDay(day, today) ? 'day today' : 'day'}
+                className={classes.join(' ')}
                 aria-label={
-                  dayLabelFormat.format(day) + (daysWithEntries?.has(dayKey(day)) ? ', hat Einträge' : '')
+                  dayLabelFormat.format(day) +
+                  (info ? `, Stimmung: ${info.label}` : '') +
+                  (daysWithMeals?.has(key) ? ', hat Einträge' : '')
                 }
                 aria-current={isSameDay(day, today) ? 'date' : undefined}
-                onClick={() => onSelectDay(day)}
+                aria-pressed={isSameDay(day, selected)}
+                onClick={() => onSelect(day)}
               >
-                {day.getDate()}
-                {daysWithEntries?.has(dayKey(day)) && <span className="day-dot" aria-hidden="true" />}
+                <span className="day-circle" style={info ? { background: info.color, color: info.text } : undefined}>
+                  {day.getDate()}
+                </span>
+                {daysWithMeals?.has(key) && <span className="day-dot" aria-hidden="true" />}
               </button>
-            ),
-          )}
+            )
+          })}
         </div>
       </div>
 
@@ -82,13 +117,47 @@ function CalendarPage({ onSelectDay }: Props) {
         <button
           type="button"
           className="secondary back-to-today"
-          onClick={() => setShown(new Date(today.getFullYear(), today.getMonth(), 1))}
+          onClick={() => {
+            setShown(new Date(today.getFullYear(), today.getMonth(), 1))
+            onSelect(today)
+          }}
         >
           Zum heutigen Monat
         </button>
       )}
 
-      <p className="hint">Tippe auf einen Tag, um Einträge zu sehen oder hinzuzufügen.</p>
+      <section className="day-entries">
+        <h2 className="day-entries-title">{dayLabelFormat.format(selected)}</h2>
+
+        {mood && (
+          <div className="entry-card">
+            <span className="entry-badge" style={{ background: mood.color }} aria-hidden="true">
+              {mood.emoji}
+            </span>
+            <div className="entry-text">
+              <strong>Stimmung</strong>
+              <span className="entry-sub">{mood.label}</span>
+            </div>
+          </div>
+        )}
+
+        {selectedMeals?.map((meal) => (
+          <div key={meal.id} className="entry-card">
+            <span className="entry-badge neutral" aria-hidden="true">
+              🍽️
+            </span>
+            <div className="entry-text">
+              <strong>Mahlzeit</strong>
+              <span className="entry-sub">{meal.description}</span>
+            </div>
+            <span className="entry-time">{timeFormat.format(meal.eatenAt)}</span>
+          </div>
+        ))}
+
+        {selectedMood === undefined && selectedMeals?.length === 0 && (
+          <p className="hint">Noch keine Einträge. Tippe oben rechts auf ＋, um etwas einzutragen.</p>
+        )}
+      </section>
     </main>
   )
 }

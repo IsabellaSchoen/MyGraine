@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { db, type User } from './db'
 import CalendarPage from './CalendarPage'
 import Dock, { type View } from './Dock'
+import EntryPage from './EntryPage'
 import LoginPage from './LoginPage'
-import MealLog from './MealLog'
 import ProfilePage from './ProfilePage'
 import './App.css'
 
@@ -31,7 +31,7 @@ function writeSession(id: number | null) {
 function App() {
   const [user, setUser] = useState<User | null>(null)
   const [checking, setChecking] = useState(() => readSession() !== null)
-  // Welche Seite gerade sichtbar ist, und für welchen Tag eingetragen wird
+  // Welche Seite gerade sichtbar ist, und welcher Tag im Kalender ausgewählt ist (für ihn wird eingetragen)
   const [view, setView] = useState<View>('home')
   const [selectedDay, setSelectedDay] = useState(() => new Date())
 
@@ -61,14 +61,9 @@ function App() {
   return (
     <div className="app-shell">
       {view === 'home' && (
-        <CalendarPage
-          onSelectDay={(day) => {
-            setSelectedDay(day)
-            setView('add')
-          }}
-        />
+        <CalendarPage selected={selectedDay} onSelect={setSelectedDay} onAdd={() => setView('add')} />
       )}
-      {view === 'add' && <MealLog day={selectedDay} />}
+      {view === 'add' && <EntryPage day={selectedDay} onDone={() => setView('home')} />}
       {view === 'profile' && (
         <ProfilePage
           userId={user.id}

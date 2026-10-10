@@ -2,10 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { isSameDay } from './calendar'
 import { addMeal, currentTimeString, deleteMeal, mealsOfDay, timeOnDay } from './meals'
-import './App.css'
 
 const timeFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' })
-const dateFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
 
 interface Props {
   // Der Tag, für den Einträge angezeigt und gespeichert werden
@@ -36,11 +34,8 @@ function MealLog({ day }: Props) {
   }
 
   return (
-    <main className="page">
-      <header>
-        <h1>Mahlzeit eintragen</h1>
-        <p className="date">{dateFormat.format(day)}</p>
-      </header>
+    <>
+      <h2>Mahlzeit eintragen</h2>
 
       <form className="card meal-form" onSubmit={handleSubmit}>
         <label htmlFor="description">Was hast du gegessen?</label>
@@ -73,7 +68,7 @@ function MealLog({ day }: Props) {
       </form>
 
       <section>
-        <h2>{isToday ? 'Heute' : 'An diesem Tag'}</h2>
+        <h2>{isToday ? 'Mahlzeiten heute' : 'Mahlzeiten an diesem Tag'}</h2>
         {meals === undefined ? (
           <p className="hint">Lade …</p>
         ) : meals.length === 0 ? (
@@ -99,7 +94,7 @@ function MealLog({ day }: Props) {
           </ul>
         )}
       </section>
-    </main>
+    </>
   )
 }
 

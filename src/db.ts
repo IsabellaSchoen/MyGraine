@@ -29,8 +29,18 @@ export interface Profile {
   updatedAt: number
 }
 
+// Die allgemeine Stimmung eines Tages, höchstens ein Eintrag pro Tag.
+export interface Mood {
+  // Der Tag als "JJJJ-MM-TT" (siehe dayKey in calendar.ts), gleichzeitig der Schlüssel
+  day: string
+  // 1 = gar nicht gut … 5 = sehr gut
+  level: number
+  updatedAt: number
+}
+
 export const db = new Dexie('MyGraine') as Dexie & {
   meals: EntityTable<Meal, 'id'>
+  moods: EntityTable<Mood, 'day'>
   users: EntityTable<User, 'id'>
   profiles: EntityTable<Profile, 'userId'>
 }
@@ -51,4 +61,12 @@ db.version(3).stores({
   meals: '++id, eatenAt',
   users: '++id, &username',
   profiles: 'userId',
+})
+
+// Version 4: Stimmung pro Tag. "day" ist der Schlüssel, damit jeder Tag genau eine Stimmung hat.
+db.version(4).stores({
+  meals: '++id, eatenAt',
+  users: '++id, &username',
+  profiles: 'userId',
+  moods: 'day',
 })
