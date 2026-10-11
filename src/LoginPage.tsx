@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { AuthError, login, MIN_PASSWORD_LENGTH, register } from './auth'
-import { BrainIcon } from './BrainIcon'
+import { BrainMascot } from './BrainMascot'
 import type { User } from './db'
 
 interface Props {
@@ -47,8 +47,8 @@ function LoginPage({ onLoggedIn }: Props) {
     <main className="page login-page">
       <h1 className="login-title">How are you MyGraining today?</h1>
 
-      <div className="brain-circle">
-        <BrainIcon />
+      <div className="brain-mascot">
+        <BrainMascot />
       </div>
 
       <form className="card login-form" onSubmit={handleSubmit}>

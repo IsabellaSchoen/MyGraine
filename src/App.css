@@ -155,21 +155,14 @@ button.delete {
   line-height: 1.25;
 }
 
-.brain-circle {
-  width: min(56vw, 220px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 4px solid var(--accent);
-  background: var(--card);
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.brain-mascot {
+  width: min(62vw, 260px);
 }
 
-.brain-circle svg {
-  width: 66%;
-  height: 66%;
+.brain-mascot svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .login-form {
