@@ -63,6 +63,18 @@ function App() {
       {view === 'home' && (
         <CalendarPage selected={selectedDay} onSelect={setSelectedDay} />
       )}
+      {view === 'lexicon' && (
+        <main className="page">
+          <h1>Lexikon</h1>
+          <p>Hier entsteht bald ein Lexikon rund um Migräne.</p>
+        </main>
+      )}
+      {view === 'stats' && (
+        <main className="page">
+          <h1>Statistik</h1>
+          <p>Hier siehst du bald Auswertungen deiner Einträge.</p>
+        </main>
+      )}
       {view === 'add' && <EntryPage day={selectedDay} onDone={() => setView('home')} />}
       {view === 'profile' && (
         <ProfilePage

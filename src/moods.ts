@@ -5,12 +5,12 @@ export type MoodLevel = 1 | 2 | 3 | 4 | 5
 
 // Die fünf Stimmungen, von sehr gut bis gar nicht gut.
 // `color` füllt den Kreis im Kalender, `text` ist die gut lesbare Schriftfarbe darauf.
-export const MOODS: { level: MoodLevel; emoji: string; label: string; color: string; text: string }[] = [
-  { level: 5, emoji: '😄', label: 'Sehr gut', color: '#2e9e5b', text: '#ffffff' },
-  { level: 4, emoji: '🙂', label: 'Gut', color: '#9ccc65', text: '#1f2328' },
-  { level: 3, emoji: '😐', label: 'Mittel', color: '#f4d03f', text: '#1f2328' },
-  { level: 2, emoji: '🙁', label: 'Nicht gut', color: '#f39c3d', text: '#1f2328' },
-  { level: 1, emoji: '😣', label: 'Gar nicht gut', color: '#e04f3c', text: '#ffffff' },
+export const MOODS: { level: MoodLevel; label: string; color: string; text: string }[] = [
+  { level: 5, label: 'Sehr gut', color: '#2e9e5b', text: '#ffffff' },
+  { level: 4, label: 'Gut', color: '#9ccc65', text: '#1f2328' },
+  { level: 3, label: 'Mittel', color: '#f4d03f', text: '#1f2328' },
+  { level: 2, label: 'Nicht gut', color: '#f39c3d', text: '#1f2328' },
+  { level: 1, label: 'Gar nicht gut', color: '#e04f3c', text: '#ffffff' },
 ]
 
 export function moodInfo(level: number) {
