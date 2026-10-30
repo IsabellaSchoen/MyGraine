@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { dayKey, isSameDay, monthGrid, WEEKDAYS_LONG, WEEKDAYS_SHORT } from './calendar'
 import { db } from './db'
 import { mealsOfDay } from './meals'
-import { moodInfo, moodOfDay, moodsOfMonth } from './moods'
+import { moodInfo, moodsOfMonth } from './moods'
 
 const monthFormat = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
 const dayLabelFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -35,10 +35,9 @@ function CalendarPage({ selected, onSelect }: Props) {
     return new Set(meals.map((m) => dayKey(new Date(m.eatenAt))))
   }, [year, month])
 
-  // Alles, was unter dem Kalender für den ausgewählten Tag angezeigt wird
-  const selectedMood = useLiveQuery(() => moodOfDay(selected), [selected])
+  // Die Einträge des ausgewählten Tages unter dem Kalender. Die Stimmung steht nicht in der Liste,
+  // sie ist nur an der Farbe des Tages im Kalender zu sehen.
   const selectedMeals = useLiveQuery(() => mealsOfDay(selected), [selected])
-  const mood = selectedMood !== undefined ? moodInfo(selectedMood) : undefined
 
   function changeMonth(delta: number) {
     setShown(new Date(year, month + delta, 1))
@@ -121,18 +120,6 @@ function CalendarPage({ selected, onSelect }: Props) {
       <section className="day-entries">
         <h2 className="day-entries-title">{dayLabelFormat.format(selected)}</h2>
 
-        {mood && (
-          <div className="entry-card">
-            <span className="entry-badge" style={{ background: mood.color }} aria-hidden="true">
-              {mood.emoji}
-            </span>
-            <div className="entry-text">
-              <strong>Stimmung</strong>
-              <span className="entry-sub">{mood.label}</span>
-            </div>
-          </div>
-        )}
-
         {selectedMeals?.map((meal) => (
           <div key={meal.id} className="entry-card">
             <span className="entry-badge neutral" aria-hidden="true">
@@ -146,7 +133,7 @@ function CalendarPage({ selected, onSelect }: Props) {
           </div>
         ))}
 
-        {selectedMood === undefined && selectedMeals?.length === 0 && (
+        {selectedMeals?.length === 0 && (
           <p className="hint">Noch keine Einträge. Tippe unten auf ＋, um etwas einzutragen.</p>
         )}
       </section>

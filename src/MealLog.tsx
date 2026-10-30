@@ -12,7 +12,6 @@ interface Props {
 
 function MealLog({ day }: Props) {
   const [description, setDescription] = useState('')
-  const [time, setTime] = useState(currentTimeString)
   const [saving, setSaving] = useState(false)
 
   const [now] = useState(() => new Date())
@@ -25,9 +24,9 @@ function MealLog({ day }: Props) {
     if (!description.trim()) return
     setSaving(true)
     try {
-      await addMeal(description, timeOnDay(day, time))
+      // Die Uhrzeit wird automatisch beim Speichern genommen (aktuelle Uhrzeit am gewählten Tag).
+      await addMeal(description, timeOnDay(day, currentTimeString()))
       setDescription('')
-      setTime(currentTimeString())
     } finally {
       setSaving(false)
     }
@@ -47,20 +46,6 @@ function MealLog({ day }: Props) {
           rows={3}
           required
         />
-
-        <label htmlFor="time">Uhrzeit</label>
-        <div className="time-row">
-          <input
-            id="time"
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            required
-          />
-          <button type="button" className="secondary" onClick={() => setTime(currentTimeString())}>
-            Jetzt
-          </button>
-        </div>
 
         <button type="submit" disabled={saving || !description.trim()}>
           Speichern
